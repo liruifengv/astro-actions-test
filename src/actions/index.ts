@@ -10,4 +10,13 @@ export const server = {
       return { success: true };
     },
   }),
+  test: defineAction({
+    input: z.object({
+      test: z.string(),
+    }),
+    handler: async ({ test }) => {
+      console.log(`Received test: ${test}`);
+      return { success: true };
+    },
+  }),
 };

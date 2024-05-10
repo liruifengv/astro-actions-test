@@ -6,7 +6,7 @@ export function ActionButton() {
           e.preventDefault();
           console.log('clicked');
           const result = await actions.click.safe({
-            
+            name: 'liruifengv'
           });
           console.log(result);
         }}>
