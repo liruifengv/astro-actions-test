@@ -4,11 +4,6 @@ export function ActionFormNoJS() {
   return (
     <form
       method="POST"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target as HTMLFormElement);
-        const result = await actions.newsletter(formData);
-      }}
     >
       <input {...getActionProps(actions.newsletter)} />
       <label htmlFor="email2">Email</label>

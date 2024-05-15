@@ -33,14 +33,14 @@ import {ActionCustomError} from '../components/ActionCustomError';
     </a>
     <div class="text-3xl">Examples</div>
     <div class="text-xl">普通接收 json 的 Action</div>
-    <ActionButton client:only="react"/>
+    <ActionButton client:load/>
 
     <div class="text-xl">接收 from 的 Action</div>
-    <ActionForm client:only="react"/>
+    <ActionForm client:load/>
     <div class="text-xl">No js 渐进增强</div>
-    <ActionFormNoJS client:only="react"/>
+    <ActionFormNoJS client:load />
 
     <div class="text-xl">自定义错误</div>
-    <ActionCustomError client:only="react"/>
+    <ActionCustomError client:load />
 	</body>
 </html>
