@@ -5,12 +5,16 @@ export function ActionButton() {
     <button onClick={async (e) => {
           e.preventDefault();
           console.log('clicked');
-          const result = await actions.click.safe({
-            name: 'liruifengv'
+          const result = await actions.click({
+            name: 'liruifengv',
+            massage: 'hello',
           });
           console.log(result);
+          if (result.success) {
+            alert(result.data);
+          }
         }}>
-      Sign Up
+      click me
     </button>
   );
 }

@@ -2,14 +2,45 @@
 import BaseHead from '../components/BaseHead.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import {ActionButton} from '../components/ActionButton';
+import {ActionForm} from '../components/ActionForm';
+import {ActionFormNoJS} from '../components/ActionFormNoJS';
+import {ActionCustomError} from '../components/ActionCustomError';
+
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      .text-xl {
+        font-size: 1.25rem;
+      }
+      .text-3xl {
+        font-size: 1.875rem;
+      }
+      .p-5 {
+        padding: 1.25rem;
+      }
+    </style>
 	</head>
-	<body>
+	<body class="p-5">
+    <div>Astro Actions API，提供客户端直接 type-safe 调用服务端 function 的方式。</div>
+    <a target="_blank" href="https://docs.astro.build/en/reference/configuration-reference/#experimentalactions">文档</a>
+    <br />
+    <a target="_blank" href="https://github.com/withastro/roadmap/blob/actions/proposals/0046-actions.md">
+      相关RFC: 
+    </a>
+    <div class="text-3xl">Examples</div>
+    <div class="text-xl">普通接收 json 的 Action</div>
     <ActionButton client:only="react"/>
+
+    <div class="text-xl">接收 from 的 Action</div>
+    <ActionForm client:only="react"/>
+    <div class="text-xl">No js 渐进增强</div>
+    <ActionFormNoJS client:only="react"/>
+
+    <div class="text-xl">自定义错误</div>
+    <ActionCustomError client:only="react"/>
 	</body>
 </html>
