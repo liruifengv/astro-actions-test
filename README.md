@@ -1,68 +1,219 @@
-# Astro Starter Kit: Blog
+# Test Astro Actions API
 
-```sh
-npm create astro@latest -- --template blog
+## Astro Actions API，提供客户端直接 type-safe 调用服务端 function 的方式。
+
+[相关文档](https://docs.astro.build/en/reference/configuration-reference/#experimentalactions)
+
+[RFC](https://github.com/withastro/roadmap/blob/actions/proposals/0046-actions.md)
+
+
+## Usage example
+
+### 普通接收 json 的 Action
+
+在 src/actions/index.ts 中定义
+
+```ts
+import { defineAction, z } from "astro:actions";
+
+export const server = {
+  click: defineAction({
+    input: z.object({
+      name: z.string(),
+      massage: z.string(),
+    }),
+    handler: async ({ name }) => {
+      console.log(`Received name: ${name}`);
+      return { success: true, data: `Hello ${name}` };
+    },
+  }),
+};
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/blog)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/blog)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/blog/devcontainer.json)
+React 客户端组件：`ActionButton.tsx`
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+```tsx
 
-![blog](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+import { actions } from "astro:actions";
 
-Features:
-
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-├── public/
-├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+export function ActionButton() {
+  return (
+    <button onClick={async (e) => {
+          e.preventDefault();
+          console.log('clicked');
+          const result = await actions.click({
+            name: 'liruifengv',
+            massage: 'hello',
+          });
+          console.log(result);
+          if (result.success) {
+            alert(result.data);
+          }
+        }}>
+      click me
+    </button>
+  );
+}
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+### 接收 from 的 Action
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+在 src/actions/index.ts 中定义
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+```ts
+import { defineAction, z } from "astro:actions";
 
-Any static assets, like images, can be placed in the `public/` directory.
+export const server = {
+  signUp: defineAction({
+    accept: "form",
+    input: z.object({
+      username: z.string(),
+      email: z.string().email(),
+      password: z.string().min(8),
+    }),
+    handler: async ({ username, email, password }) => {
+      console.log(`Received username: ${username}, email: ${email}`);
+      return { success: true };
+    },
+  }),
+};
+```
 
-## 🧞 Commands
+React 客户端组件：`ActionForm.tsx`
 
-All commands are run from the root of the project, from a terminal:
+```tsx
+import { actions } from "astro:actions";
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+export function ActionForm() {
+  return (
+    <form
+      style={{ display: "flex", flexDirection: "column", width: "200px"}}
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+        const result = await actions.signUp(formData);
+        if (result.success) {
+          alert("Sign up successful!");
+        }
+      }}
+    >
+      <label htmlFor="username">username</label>
+      <input id="username" type="text" name="username" />
+      <label htmlFor="email">email</label>
+      <input id="email" type="email" name="email" />
+      <label htmlFor="password">password</label>
+      <input id="password" type="password" name="password" />
+      <br/>
+      <button type="submit">Sign up</button>
+    </form>
+  );
+}
+```
 
-## 👀 Want to learn more?
+### No js 渐进增强
+在 src/actions/index.ts 中定义
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```ts
+import { defineAction, z } from "astro:actions";
 
-## Credit
+export const server = {
+  newsletter: defineAction({
+    accept: "form",
+    input: z.object({
+      email2: z.string().email(),
+      receivePromo: z.boolean(),
+    }),
+    handler: async ({ email2, receivePromo }) => {
+      return { success: true };
+    },
+  }),
+};
+```
+React 客户端组件：`ActionFormNoJS.tsx`
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+form 上增加 `method="POST"`。
+新增一个 input 设置 `...getActionProps(actions.newsletter)`。
+
+就会在没有 js 的情况下，通过 form 提交数据。
+
+```tsx
+import { actions, getActionProps } from "astro:actions";
+
+export function ActionFormNoJS() {
+  return (
+    <form
+      method="POST"
+    >
+      <input {...getActionProps(actions.newsletter)} />
+      <label htmlFor="email2">Email</label>
+      <input name="email2" type="email" id="email2" />
+
+      <label htmlFor="receivePromo">Receive promotional emails</label>
+      <input name="receivePromo" type="checkbox" id="receivePromo" checked onChange={()=>{
+        console.log("checked")
+      }}/>
+
+      <button type="submit">Sign Up</button>
+    </form>
+  );
+}
+```
+
+### 自定义错误与错误处理
+
+在 src/actions/index.ts 中定义
+
+throw 一个 `ActionError`，可以自定义错误码与错误信息。
+
+```ts
+import { defineAction, z } from "astro:actions";
+
+export const server = {
+  customError: defineAction({
+    input: z.object({
+      name: z.string(),
+    }),
+    handler: async ({ name }) => {
+      const { cookies } = getApiContext();
+      console.log(`cookies: ${cookies.get("refreshToken")?.value}`);
+      throw new ActionError({
+        code: "BAD_REQUEST",
+        message: "Custom error message",
+      });
+    },
+  }),
+};
+```
+
+React 客户端组件：`ActionCustomError.tsx`
+
+使用 `actions.customError.safe` 进行安全调用，会在 zod 校验参数失败时返回 `InputError`。
+
+使用 `isInputError` 判断是否是参数错误。
+
+```tsx
+import { actions, isInputError } from "astro:actions";
+
+export function ActionCustomError() {
+  return (
+    <button onClick={async (e) => {
+          e.preventDefault();
+          console.log('clicked');
+          const { data, error }  = await actions.customError.safe({
+            name: 'liruifengv',
+          });
+          if (error) {
+            if (isInputError(error)) {
+              console.log("Handle Input error: ", error.fields);
+            } else {
+              console.log("Handle other errors: ", error.status, error.message);
+            }
+          } else {
+            console.log("Success", data);
+          }
+        }}>
+      click me
+    </button>
+  );
+}
+```
